@@ -1,6 +1,6 @@
 from app import db
 from app.models.book import Book
-from flask import Blueprint, jsonify, make_response, request
+from flask import Blueprint, jsonify, make_response, request, abort
 
 
 def validate_book(book_id):
@@ -34,8 +34,13 @@ def create_book():
 
 @books_bp.route("", methods=["GET"])
 def read_all_books():
+    title_query = request.args.get('title')
+    if title_query:
+        books = Book.query.filter_by(title=title_query)
+    else:
+        books = Book.query.all()
+
     books_response = []
-    books = Book.query.all()
     for book in books:
         books_response.append(
             {
@@ -68,7 +73,7 @@ def update_book(book_id):
 
         db.session.commit()
     except KeyError:
-        return make_response("More inforomation about the book is neeeded")
+        return make_response("More inforomation about the book is neeeded"), 400
 
     return make_response(f"Book #{book.id} successfully updated")
 
