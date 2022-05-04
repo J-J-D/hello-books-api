@@ -34,9 +34,22 @@ def create_book():
 
 @books_bp.route("", methods=["GET"])
 def read_all_books():
-    title_query = request.args.get('title')
-    if title_query:
-        books = Book.query.filter_by(title=title_query)
+    # title_query = request.args.get('title')
+    # if title_query:
+    #     books = Book.query.filter_by(title=title_query)
+    # else:
+    #     books = Book.query.all()
+
+    request_body = request.get_json()
+
+    params = request.args
+
+    if "title" in params:
+        found_title = params['title']
+        books = Book.query.filter_by(title=found_title)
+    elif "id" in params:
+        found_id = params['id']
+        books = Book.query.filter_by(id=found_id)
     else:
         books = Book.query.all()
 
